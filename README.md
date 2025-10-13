@@ -1,4 +1,17 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Best Buy Dashboard
+
+A modern, interactive dashboard built with Next.js, TypeScript, and Tailwind CSS featuring a multi-step plan selection flow.
+
+## Features
+
+- **Dashboard with 5 tiles**: Dashboard, OfferGrid, Assist, Quiz, and Hot Offers displayed in a responsive grid
+- **Interactive Plan Selection**: 
+  - Draggable provider logos (Bell & Virgin)
+  - New/Existing customer type selection
+  - Multi-step form with navigation
+- **Subscriber Management**: Interactive counter with visual representation and pricing details
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Modern UI**: Beautiful gradients, shadows, and smooth transitions
 
 ## Getting Started
 
@@ -6,19 +19,28 @@ First, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/src/app` - Next.js App Router pages
+  - `/assist` - Multi-step plan selection flow
+  - `/dashboard` - Dashboard analytics page
+  - `/offers` - OfferGrid page
+  - `/quiz` - Quiz page
+  - `/hot-offers` - Hot offers page
+- `/src/components` - React components
+  - `ProviderSelection.tsx` - Draggable provider selection
+  - `SubscriberCount.tsx` - Subscriber counter with pricing
+
+## Tech Stack
+
+- **Next.js 15** - React framework with App Router
+- **TypeScript** - Type-safe code
+- **Tailwind CSS** - Utility-first styling
+- **React 19** - Latest React features
 
 ## Learn More
 

@@ -1,0 +1,19 @@
+<svg viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Virgin logo representation -->
+  <defs>
+    <linearGradient id="virginGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#E10A0A;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF0000;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Red swoosh/checkmark design -->
+  <path d="M 30 45 Q 50 20, 80 35 Q 95 45, 100 40 Q 110 30, 130 35 Q 150 40, 170 30" 
+        fill="none" stroke="url(#virginGradient)" stroke-width="8" stroke-linecap="round"/>
+  
+  <!-- Circle element -->
+  <circle cx="175" cy="28" r="6" fill="url(#virginGradient)"/>
+  
+  <!-- Text -->
+  <text x="100" y="70" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#E10A0A" text-anchor="middle">Virgin</text>
+</svg>
