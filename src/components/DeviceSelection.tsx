@@ -278,6 +278,8 @@ export default function DeviceSelection({
                 <Image
                   src={device.image}
                   alt={device.name}
+                  width={128}
+                  height={160}
                   className="w-full h-full object-contain"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
