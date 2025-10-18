@@ -7,7 +7,21 @@ import ProviderSelection from '@/components/ProviderSelection';
 import ProviderTypeSelection from '@/components/ProviderTypeSelection';
 import PlanOptions from '@/components/PlanOptions';
 import CustomerCategory from '@/components/CustomerCategory';
+import DeviceSelection from '@/components/DeviceSelection';
 import EnhancedSubscriberCount, { type Subscriber } from '@/components/EnhancedSubscriberCount';
+
+// Define Device interface to match DeviceSelection component
+interface Device {
+  id: string;
+  name: string;
+  brand: string;
+  model: string;
+  color: string;
+  storage: string;
+  price: number;
+  image: string;
+  category: string;
+}
 
 export default function AssistPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -16,6 +30,7 @@ export default function AssistPage() {
   const [providerType, setProviderType] = useState<'byod' | 'smartpay' | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [subscriberCount, setSubscriberCount] = useState(1);
   const [subscriberList, setSubscriberList] = useState<Subscriber[]>([]);
 
@@ -49,7 +64,15 @@ export default function AssistPage() {
 
   const handleCategorySelection = (category: string | null) => {
     setSelectedCategory(category);
-    // Customer category is now the final step, no auto-advance
+    // Auto-advance to step 6 when category is selected
+    if (category) {
+      setTimeout(() => setCurrentStep(6), 500);
+    }
+  };
+
+  const handleDeviceSelection = (device: Device | null) => {
+    setSelectedDevice(device);
+    // Device selection is now the final step, no auto-advance
   };
 
   const handleNext = () => {
@@ -61,11 +84,16 @@ export default function AssistPage() {
       setCurrentStep(4);
     } else if (currentStep === 4) {
       setCurrentStep(5);
+    } else if (currentStep === 5 && selectedCategory) {
+      setCurrentStep(6);
     }
   };
 
   const handleBack = () => {
-    if (currentStep === 5) {
+    if (currentStep === 6) {
+      setCurrentStep(5);
+      setSelectedDevice(null); // Reset device selection
+    } else if (currentStep === 5) {
       setCurrentStep(4);
       setSelectedCategory(null); // Reset category selection
     } else if (currentStep === 4) {
@@ -109,33 +137,39 @@ export default function AssistPage() {
             <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${currentStep >= 1 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}>
               1
             </div>
-            <div className={`w-8 h-1 ${currentStep >= 2 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
+            <div className={`w-6 h-1 ${currentStep >= 2 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
             <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${currentStep >= 2 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}>
               2
             </div>
-            <div className={`w-8 h-1 ${currentStep >= 3 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
+            <div className={`w-6 h-1 ${currentStep >= 3 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
             <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${currentStep >= 3 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}>
               3
             </div>
-            <div className={`w-8 h-1 ${currentStep >= 4 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
+            <div className={`w-6 h-1 ${currentStep >= 4 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
             <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${currentStep >= 4 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}>
               4
             </div>
-            <div className={`w-8 h-1 ${currentStep >= 5 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
+            <div className={`w-6 h-1 ${currentStep >= 5 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
             <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${currentStep >= 5 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}>
               5
+            </div>
+            <div className={`w-6 h-1 ${currentStep >= 6 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
+            <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${currentStep >= 6 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}>
+              6
             </div>
           </div>
           <div className="flex items-center justify-center mt-2 space-x-1">
             <span className="text-xs font-medium text-[var(--foreground)]">Provider</span>
-            <span className="w-8"></span>
+            <span className="w-6"></span>
             <span className="text-xs font-medium text-[var(--foreground)]">Type</span>
-            <span className="w-8"></span>
+            <span className="w-6"></span>
             <span className="text-xs font-medium text-[var(--foreground)]">Plan</span>
-            <span className="w-8"></span>
+            <span className="w-6"></span>
             <span className="text-xs font-medium text-[var(--foreground)]">Subscribers</span>
-            <span className="w-8"></span>
+            <span className="w-6"></span>
             <span className="text-xs font-medium text-[var(--foreground)]">Category</span>
+            <span className="w-6"></span>
+            <span className="text-xs font-medium text-[var(--foreground)]">Device</span>
           </div>
         </div>
 
@@ -183,12 +217,20 @@ export default function AssistPage() {
             />
           )}
 
+          {currentStep === 6 && (
+            <DeviceSelection
+              selectedDevice={selectedDevice}
+              setSelectedDevice={handleDeviceSelection}
+            />
+          )}
+
           {/* Navigation Buttons */}
           <div className={`flex ${
             (currentStep === 1 && (!selectedProvider || !customerType)) || 
             (currentStep === 2 && !providerType) || 
             (currentStep === 3 && !selectedPlan) || 
-            (currentStep === 5 && !selectedCategory) ? 'justify-start' : 'justify-between'
+            (currentStep === 5 && !selectedCategory) ||
+            (currentStep === 6 && !selectedDevice) ? 'justify-start' : 'justify-between'
           } mt-8 pt-6 border-t border-[var(--border)]`}>
 
             <button
@@ -235,6 +277,15 @@ export default function AssistPage() {
             )}
             
             {(currentStep === 5 && selectedCategory) && (
+              <button
+                onClick={handleNext}
+                className="px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
+              >
+                Next
+              </button>
+            )}
+            
+            {(currentStep === 6 && selectedDevice) && (
               <button
                 onClick={() => {
                   // Handle completion logic here
