@@ -1,6 +1,6 @@
 'use client';
 
-import { PlusIcon, MinusIcon, CheckIcon } from './Icons';
+import { PlusIcon, MinusIcon } from './Icons';
 import { useState } from 'react';
 
 interface SubscriberCountProps {

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { CheckIcon } from './Icons';
+import Image from 'next/image';
 
 interface Device {
   id: string;
@@ -107,7 +108,7 @@ const devices: Device[] = [
     model: 'Galaxy Z Flip5',
     color: 'Mint',
     storage: '256GB',
-    price: 999,
+    price: 999, 
     image: 'https://images.samsung.com/is/image/samsung/p6pim/ca/2307/gallery/ca-galaxy-z-flip5-f731-sm-f731bzgcxac-thumb-537515739',
     category: 'smartphone'
   }
@@ -274,7 +275,7 @@ export default function DeviceSelection({
             <div className="text-center">
               {/* Device Image */}
               <div className="w-32 h-40 mx-auto mb-4 bg-[var(--muted)] rounded-lg flex items-center justify-center overflow-hidden">
-                <img
+                <Image
                   src={device.image}
                   alt={device.name}
                   className="w-full h-full object-contain"

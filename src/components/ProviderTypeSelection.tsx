@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { CheckIcon } from './Icons';
 
 interface ProviderTypeSelectionProps {

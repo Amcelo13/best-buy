@@ -1,7 +1,6 @@
 'use client';
 
 import { PlusIcon, MinusIcon, TrashIcon, CopyIcon } from './Icons';
-import { useState } from 'react';
 
 export interface Subscriber {
   id: number;

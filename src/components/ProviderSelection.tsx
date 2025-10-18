@@ -53,6 +53,7 @@ function DropZone({
 }: { 
   id: string; 
   type: string; 
+  // @typescript-eslint/no-unused-vars
   icon: any; 
   droppedProvider?: { name: string; logo: string } | null;
 }) {
