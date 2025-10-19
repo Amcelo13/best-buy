@@ -1,6 +1,7 @@
 'use client';
 
-import { PlusIcon, MinusIcon, TrashIcon, CopyIcon } from './Icons';
+import React from 'react';
+import { TrashIcon, CopyIcon, PlusIcon } from './Icons';
 
 export interface Subscriber {
   id: number;
@@ -15,7 +16,8 @@ interface SubscriberCountProps {
   providerType: 'byod' | 'smartpay';
   planOption: string;
   subscriberList: Subscriber[];
-  setSubscriberList: (list: Subscriber[]) => void;
+  setSubscriberList: React.Dispatch<React.SetStateAction<Subscriber[]>>;
+  onAddAnother?: () => void; // New prop to handle adding another subscriber
 }
 
 const planNames: Record<string, string> = {
@@ -31,92 +33,78 @@ export default function SubscriberCount({
   planOption,
   subscriberList,
   setSubscriberList,
+  onAddAnother,
 }: SubscriberCountProps) {
 
-  const increment = () => {
-    setSubscriberCount(subscriberCount + 1);
-  };
+  // Auto-add current selection to list on component mount
+  React.useEffect(() => {
+    // Only add if this combination doesn't already exist in the list
+    setSubscriberList(prevList => {
+      const exists = prevList.some(sub => 
+        sub.providerType === providerType && sub.planOption === planOption
+      );
+      
+      if (!exists) {
+        const newSubscriber: Subscriber = {
+          id: Date.now() + Math.random(), // Ensure unique ID
+          providerType,
+          planOption,
+          planName: planNames[planOption] || planOption
+        };
+        return [...prevList, newSubscriber];
+      }
+      return prevList;
+    });
+  }, [providerType, planOption, setSubscriberList]);
 
-  const decrement = () => {
-    if (subscriberCount > 1) {
-      setSubscriberCount(subscriberCount - 1);
-    }
-  };
+  const removeFromList = React.useCallback((id: number) => {
+    // Use functional update to ensure we have the latest state
+    setSubscriberList(prevList => {
+      const newList = prevList.filter(sub => sub.id !== id);
+      console.log('Removing subscriber with id:', id);
+      console.log('Previous list length:', prevList.length);
+      console.log('New list length:', newList.length);
+      return newList;
+    });
+  }, [setSubscriberList]);
 
-  const addToList = () => {
-    const newSubscribers: Subscriber[] = [];
-    for (let i = 0; i < subscriberCount; i++) {
-      const newSubscriber: Subscriber = {
-        id: Date.now() + i, // Add unique id for each subscriber
-        providerType,
-        planOption,
-        planName: planNames[planOption] || planOption
+  const duplicateSubscriber = React.useCallback((subscriber: Subscriber) => {
+    // Use functional update and ensure unique timestamp
+    setSubscriberList(prevList => {
+      const duplicated: Subscriber = {
+        ...subscriber,
+        id: Date.now() + Math.random() // Add randomness to ensure uniqueness
       };
-      newSubscribers.push(newSubscriber);
-    }
-    setSubscriberList([...subscriberList, ...newSubscribers]);
-  };
-
-  const removeFromList = (id: number) => {
-    setSubscriberList(subscriberList.filter(sub => sub.id !== id));
-  };
-
-  const duplicateSubscriber = (subscriber: Subscriber) => {
-    const duplicated: Subscriber = {
-      ...subscriber,
-      id: Date.now()
-    };
-    setSubscriberList([...subscriberList, duplicated]);
-  };
+      return [...prevList, duplicated];
+    });
+  }, [setSubscriberList]);
 
   return (
     <div className="space-y-8">
       <h2 className="text-2xl font-bold text-center text-[var(--foreground)] mb-8">
-        Number of Subscribers
+        Subscribers Added
       </h2>
 
       {/* Current Selection Summary */}
       <div className="bg-[var(--accent)] border border-[var(--primary)] rounded-lg p-4 mb-6">
         <div className="text-center">
           <p className="text-[var(--foreground)] font-medium">
-            Adding subscribers for: <span className="font-bold text-blue-500">{providerType.toUpperCase()}</span> - <span className="font-bold text-blue-500">{planNames[planOption]}</span>
+            Current Selection: <span className="font-bold text-blue-500">{providerType.toUpperCase()}</span> - <span className="font-bold text-blue-500">{planNames[planOption]}</span>
+          </p>
+          <p className="text-[var(--muted-foreground)] text-sm mt-1">
+            This has been automatically added to your subscriber list
           </p>
         </div>
       </div>
 
-      {/* Subscriber Counter */}
-      <div className="flex flex-col items-center justify-center space-y-6">
-        <div className="flex items-center space-x-8">
-          <button
-            onClick={decrement}
-            disabled={subscriberCount <= 1}
-            className="w-12 h-12 rounded-full bg-[var(--secondary)] text-[var(--secondary-foreground)] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all"
-          >
-            <MinusIcon size={20} />
-          </button>
-
-          <div className="text-6xl font-bold text-[var(--primary)] min-w-[120px] text-center">
-            {subscriberCount}
-          </div>
-
-          <button
-            onClick={increment}
-            className="w-12 h-12 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 flex items-center justify-center transition-all"
-          >
-            <PlusIcon size={20} />
-          </button>
-        </div>
-
-        <p className="text-[var(--muted-foreground)] text-center">
-          Select the number of subscribers for this plan
-        </p>
-
-        {/* Add to List Button */}
+      {/* Add Another Subscriber Button */}
+      <div className="flex justify-center">
         <button
-          onClick={addToList}
-          className="px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
+          onClick={onAddAnother}
+          className="flex items-center space-x-2 px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
         >
-          Add {subscriberCount} Subscriber{subscriberCount > 1 ? 's' : ''} to List
+          <PlusIcon size={20} />
+          <span>Add Another Subscriber</span>
         </button>
       </div>
 
@@ -124,7 +112,7 @@ export default function SubscriberCount({
       {subscriberList.length > 0 && (
         <div className="mt-8 bg-[var(--card)] rounded-xl border border-[var(--border)] p-6">
           <h3 className="text-lg font-bold text-[var(--foreground)] mb-4">
-            Added Subscribers ({subscriberList.length})
+            Your Subscribers ({subscriberList.length})
           </h3>
           <div className="space-y-3">
             {subscriberList.map((subscriber, index) => (
@@ -156,7 +144,15 @@ export default function SubscriberCount({
                     <CopyIcon size={16} />
                   </button>
                   <button
-                    onClick={() => removeFromList(subscriber.id)}
+                    onClick={() => {
+                      if (subscriberList.length === 1) {
+                        if (confirm('This is your last subscriber. Are you sure you want to remove it?')) {
+                          removeFromList(subscriber.id);
+                        }
+                      } else {
+                        removeFromList(subscriber.id);
+                      }
+                    }}
                     className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
                     title="Delete"
                   >

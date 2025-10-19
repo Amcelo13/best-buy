@@ -69,6 +69,12 @@ export default function AssistPage() {
     }
   };
 
+  const handleAddAnotherSubscriber = () => {
+    setCurrentStep(2);
+    setProviderType(null); // Reset provider type selection
+    setSelectedPlan(null); // Reset plan selection
+  };
+
   const handleDeviceSelection = (device: Device | null) => {
     setSelectedDevice(device);
     // Device selection is now the final step, no auto-advance
@@ -115,7 +121,7 @@ export default function AssistPage() {
       <header className="bg-[white] shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
+            <div className="flex items-center" >
               <Image 
                 src="/logos/Bell.png" 
                 alt="Bell" 
@@ -206,6 +212,7 @@ export default function AssistPage() {
               planOption={selectedPlan}
               subscriberList={subscriberList}
               setSubscriberList={setSubscriberList}
+              onAddAnother={handleAddAnotherSubscriber}
             />
           )}
 
