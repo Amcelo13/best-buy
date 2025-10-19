@@ -4,8 +4,8 @@ import { DashboardIcon, OfferIcon, AssistIcon, QuizIcon, HotOffersIcon } from '@
 
 export default function Home() {
   const tiles = [
-    { name: 'Plan Grid ', href: '/plan-grid', Icon: DashboardIcon },
-    { name: 'OfferGrid', href: '/offers', Icon: OfferIcon },
+    { name: 'Plan Grid ', href: '/assets/Plan-grid.pdf', Icon: DashboardIcon },
+    { name: 'OfferGrid', href: '/assets/Offer Grid.xlsx', Icon: OfferIcon },
     { name: 'Assist', href: '/assist', Icon: AssistIcon },
     { name: 'Quiz', href: '/quiz', Icon: QuizIcon },
     { name: 'Hot Offers', href: '/hot-offers', Icon: HotOffersIcon },
@@ -38,6 +38,8 @@ export default function Home() {
             <Link
               key={tile.name}
               href={tile.href}
+              target={tile.href.endsWith('.pdf') || tile.href.endsWith('.xlsx') ? '_blank' : undefined}
+              rel={tile.href.endsWith('.pdf') || tile.href.endsWith('.xlsx') ? 'noopener noreferrer' : undefined}
               className="group bg-[var(--card)] rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-8 flex flex-col items-center justify-center space-y-4 border border-[var(--border)]"
             >
               <div className="text-[var(--primary)] group-hover:scale-110 transition-transform duration-300">
