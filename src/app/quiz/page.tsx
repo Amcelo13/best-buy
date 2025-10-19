@@ -1,10 +1,12 @@
+'use client';
+
 import Image from 'next/image';
 import { QuizIcon } from '@/components/Icons';
 
 export default function QuizPage() {
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      <header className="bg-[#0046BE] shadow-md">
+      <header className="bg-[white] shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -14,6 +16,8 @@ export default function QuizPage() {
                 width={120} 
                 height={40}
                 priority
+                onClick={() => window.location.href = '/'}
+                className="cursor-pointer hover:opacity-80 transition-opacity"
               />
             </div>
             {/* <h1 className="text-xl font-semibold text-white">Dashboard</h1> */}

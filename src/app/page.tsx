@@ -4,7 +4,7 @@ import { DashboardIcon, OfferIcon, AssistIcon, QuizIcon, HotOffersIcon } from '@
 
 export default function Home() {
   const tiles = [
-    { name: 'Dashboard', href: '/dashboard', Icon: DashboardIcon },
+    { name: 'Plan Grid ', href: '/plan-grid', Icon: DashboardIcon },
     { name: 'OfferGrid', href: '/offers', Icon: OfferIcon },
     { name: 'Assist', href: '/assist', Icon: AssistIcon },
     { name: 'Quiz', href: '/quiz', Icon: QuizIcon },

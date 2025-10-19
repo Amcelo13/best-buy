@@ -182,6 +182,56 @@ export default function AssistPage() {
 
         {/* Step Content */}
         <div className="bg-[var(--card)] rounded-xl shadow-lg p-8 border border-[var(--border)]">
+          {/* Top Navigation for Steps 4, 5, and 6 */}
+          {(currentStep === 4 || currentStep === 5 || currentStep === 6) && (
+            <div className="flex justify-between mb-8 pb-6 border-b border-[var(--border)]">
+              <button
+                onClick={handleBack}
+                className="px-6 py-3 bg-[var(--secondary)] text-[var(--secondary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
+              >
+                Back
+              </button>
+              
+              {currentStep === 4 && (
+                <button
+                  onClick={handleNext}
+                  className="px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
+                >
+                  Next
+                </button>
+              )}
+              
+              {(currentStep === 5 && selectedCategory) && (
+                <button
+                  onClick={handleNext}
+                  className="px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
+                >
+                  Next
+                </button>
+              )}
+              
+              {(currentStep === 5 && !selectedCategory) && (
+                <div></div>
+              )}
+              
+              {(currentStep === 6 && selectedDevice) && (
+                <button
+                  onClick={() => {
+                    // Handle completion logic here
+                    alert('Process completed!');
+                  }}
+                  className="px-6 py-3 bg-green-600 text-white rounded-lg hover:opacity-90 transition-all font-medium"
+                >
+                  Complete
+                </button>
+              )}
+              
+              {(currentStep === 6 && !selectedDevice) && (
+                <div></div>
+              )}
+            </div>
+          )}
+
           {currentStep === 1 && (
             <ProviderSelection
               selectedProvider={selectedProvider}
@@ -232,79 +282,49 @@ export default function AssistPage() {
             />
           )}
 
-          {/* Navigation Buttons */}
-          <div className={`flex ${
-            (currentStep === 1 && (!selectedProvider || !customerType)) || 
-            (currentStep === 2 && !providerType) || 
-            (currentStep === 3 && !selectedPlan) || 
-            (currentStep === 5 && !selectedCategory) ||
-            (currentStep === 6 && !selectedDevice) ? 'justify-start' : 'justify-between'
-          } mt-8 pt-6 border-t border-[var(--border)]`}>
+          {/* Bottom Navigation for Steps 1, 2, and 3 */}
+          {(currentStep !== 4 && currentStep !== 5 && currentStep !== 6) && (
+            <div className={`flex ${
+              (currentStep === 1 && (!selectedProvider || !customerType)) || 
+              (currentStep === 2 && !providerType) || 
+              (currentStep === 3 && !selectedPlan) ? 'justify-start' : 'justify-between'
+            } mt-8 pt-6 border-t border-[var(--border)]`}>
 
-            <button
-              onClick={handleBack}
-              className="px-6 py-3 bg-[var(--secondary)] text-[var(--secondary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
-            >
-              {currentStep === 1 ? 'Back to Home' : 'Back'}
-            </button>
-            
-            {(currentStep === 1 && selectedProvider && customerType) && (
               <button
-                onClick={handleNext}
-                className="px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
+                onClick={handleBack}
+                className="px-6 py-3 bg-[var(--secondary)] text-[var(--secondary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
               >
-                Next
+                {currentStep === 1 ? 'Back to Home' : 'Back'}
               </button>
-            )}
-            
-            {(currentStep === 2 && providerType) && (
-              <button
-                onClick={handleNext}
-                className="px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
-              >
-                Next
-              </button>
-            )}
-            
-            {(currentStep === 3 && selectedPlan) && (
-              <button
-                onClick={handleNext}
-                className="px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
-              >
-                Next
-              </button>
-            )}
-
-            {currentStep === 4 && (
-              <button
-                onClick={handleNext}
-                className="px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
-              >
-                Next
-              </button>
-            )}
-            
-            {(currentStep === 5 && selectedCategory) && (
-              <button
-                onClick={handleNext}
-                className="px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
-              >
-                Next
-              </button>
-            )}
-            
-            {(currentStep === 6 && selectedDevice) && (
-              <button
-                onClick={() => {
-                  // Handle completion logic here
-                  alert('Process completed!');
-                }}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:opacity-90 transition-all font-medium"
-              >
-                Complete
-              </button>
-            )}
-          </div>
+              
+              {(currentStep === 1 && selectedProvider && customerType) && (
+                <button
+                  onClick={handleNext}
+                  className="px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
+                >
+                  Next
+                </button>
+              )}
+              
+              {(currentStep === 2 && providerType) && (
+                <button
+                  onClick={handleNext}
+                  className="px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
+                >
+                  Next
+                </button>
+              )}
+              
+              {(currentStep === 3 && selectedPlan) && (
+                <button
+                  onClick={handleNext}
+                  className="px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
+                >
+                  Next
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </main>
     </div>
