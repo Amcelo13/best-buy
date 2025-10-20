@@ -63,8 +63,7 @@ export default function AssistPage() {
 
   const handleCategorySelection = (category: string | null) => {
     setSelectedCategory(category);
-    // Auto-advance to step 6 when category is selected
-    if (category) {
+    if (category && providerType !== 'byod') {
       setTimeout(() => setCurrentStep(6), 500);
     }
   };
@@ -81,6 +80,12 @@ export default function AssistPage() {
   };
 
   const handleNext = () => {
+    // Don't proceed if this is the final step for the current flow
+    if (providerType === 'byod' && currentStep === 5) {
+      console.log('BYOD flow completed at step 5');
+      return; // BYOD flow ends at step 5 (category selection)
+    }
+    
     if (currentStep === 1 && selectedProvider && customerType) {
       setCurrentStep(2);
     } else if (currentStep === 2 && providerType) {
@@ -88,10 +93,25 @@ export default function AssistPage() {
     } else if (currentStep === 3 && selectedPlan) {
       setCurrentStep(4);
     } else if (currentStep === 4) {
+      // Go to category selection for all provider types
       setCurrentStep(5);
     } else if (currentStep === 5 && selectedCategory) {
+      // Only non-BYOD flows go to step 6
       setCurrentStep(6);
     }
+  };
+  
+  // Handle step click
+  const handleStepClick = (step: number) => {
+    // Don't allow clicking on future steps
+    if (step > currentStep) return;
+    
+    // Special handling for BYOD flow
+    if (providerType === 'byod' && step > 5) {
+      return; // Skip device selection for BYOD
+    }
+    
+    setCurrentStep(step);
   };
 
   const handleBack = () => {
@@ -102,6 +122,7 @@ export default function AssistPage() {
       setCurrentStep(4);
       setSelectedCategory(null); // Reset category selection
     } else if (currentStep === 4) {
+      // Go back to subscribers step
       setCurrentStep(3);
     } else if (currentStep === 3) {
       setCurrentStep(2);
@@ -120,12 +141,12 @@ export default function AssistPage() {
       {/* Header */}
       <header className="bg-[white] shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-center">
             <div className="flex items-center">
               <Image 
                 src="/logos/Bell.png" 
-                alt="Bell" 
-                width={120} 
+                alt="" 
+                width={40} 
                 height={40}
                 priority
                 onClick={() => window.location.href = '/'}
@@ -141,29 +162,51 @@ export default function AssistPage() {
         {/* Step Indicator */}
         <div className="mb-8">
           <div className="flex items-center justify-center space-x-1">
-            <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${currentStep >= 1 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}>
+            <div 
+              onClick={() => handleStepClick(1)}
+              className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm cursor-pointer ${currentStep >= 1 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}
+            >
               1
             </div>
             <div className={`w-6 h-1 ${currentStep >= 2 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
-            <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${currentStep >= 2 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}>
+            <div 
+              onClick={() => handleStepClick(2)}
+              className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm cursor-pointer ${currentStep >= 2 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}
+            >
               2
             </div>
             <div className={`w-6 h-1 ${currentStep >= 3 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
-            <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${currentStep >= 3 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}>
+            <div 
+              onClick={() => handleStepClick(3)}
+              className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm cursor-pointer ${currentStep >= 3 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}
+            >
               3
             </div>
             <div className={`w-6 h-1 ${currentStep >= 4 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
-            <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${currentStep >= 4 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}>
+            <div 
+              onClick={() => handleStepClick(4)}
+              className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm cursor-pointer ${currentStep >= 4 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}
+            >
               4
             </div>
             <div className={`w-6 h-1 ${currentStep >= 5 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
-            <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${currentStep >= 5 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}>
+            <div 
+              onClick={() => handleStepClick(5)}
+              className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm cursor-pointer ${currentStep >= 5 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}
+            >
               5
             </div>
-            <div className={`w-6 h-1 ${currentStep >= 6 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
-            <div className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${currentStep >= 6 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}>
-              6
-            </div>
+            {providerType !== 'byod' && (
+              <>
+                <div className={`w-6 h-1 ${currentStep >= 6 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
+                <div 
+                  onClick={() => handleStepClick(6)}
+                  className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm cursor-pointer ${currentStep >= 6 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}
+                >
+                  6
+                </div>
+              </>
+            )}
           </div>
           <div className="flex items-center justify-center mt-2 space-x-1">
             <span className="text-xs font-medium text-[var(--foreground)]">Provider</span>
@@ -175,15 +218,19 @@ export default function AssistPage() {
             <span className="text-xs font-medium text-[var(--foreground)]">Subscribers</span>
             <span className="w-6"></span>
             <span className="text-xs font-medium text-[var(--foreground)]">Category</span>
-            <span className="w-6"></span>
-            <span className="text-xs font-medium text-[var(--foreground)]">Device</span>
+            {providerType !== 'byod' && (
+              <>
+                <span className="w-6"></span>
+                <span className="text-xs font-medium text-[var(--foreground)]">Device</span>
+              </>
+            )}
           </div>
         </div>
 
         {/* Step Content */}
         <div className="bg-[var(--card)] rounded-xl shadow-lg p-8 border border-[var(--border)]">
           {/* Top Navigation for Steps 4, 5, and 6 */}
-          {(currentStep === 4 || currentStep === 5 || currentStep === 6) && (
+          {(currentStep === 4 || currentStep === 5 || (currentStep === 6 && providerType !== 'byod')) && (
             <div className="flex justify-between mb-8 pb-6 border-b border-[var(--border)]">
               <button
                 onClick={handleBack}
@@ -203,10 +250,21 @@ export default function AssistPage() {
               
               {(currentStep === 5 && selectedCategory) && (
                 <button
-                  onClick={handleNext}
-                  className="px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
+                  onClick={() => {
+                    if (providerType === 'byod') {
+                      // Handle BYOD completion
+                      alert('Process completed!');
+                    } else {
+                      handleNext();
+                    }
+                  }}
+                  className={`px-6 py-3 ${
+                    providerType === 'byod' 
+                      ? 'bg-green-600 text-white' 
+                      : 'bg-[var(--primary)] text-[var(--primary-foreground)]'
+                  } rounded-lg hover:opacity-90 transition-all font-medium`}
                 >
-                  Next
+                  {providerType === 'byod' ? 'Submit' : 'Next'}
                 </button>
               )}
               
@@ -217,16 +275,16 @@ export default function AssistPage() {
               {(currentStep === 6 && selectedDevice) && (
                 <button
                   onClick={() => {
-                    // Handle completion logic here
+                    // Handle completion logic for non-BYOD flow
                     alert('Process completed!');
                   }}
                   className="px-6 py-3 bg-green-600 text-white rounded-lg hover:opacity-90 transition-all font-medium"
                 >
-                  Complete
+                  Submit
                 </button>
               )}
               
-              {(currentStep === 6 && !selectedDevice) && (
+              {(currentStep === 6 && !selectedDevice && providerType !== 'byod') && (
                 <div></div>
               )}
             </div>
@@ -272,6 +330,7 @@ export default function AssistPage() {
             <CustomerCategory
               selectedCategory={selectedCategory}
               setSelectedCategory={handleCategorySelection}
+              provider={selectedProvider || 'bell'}
             />
           )}
 
@@ -281,7 +340,7 @@ export default function AssistPage() {
               setSelectedDevice={handleDeviceSelection}
             />
           )}
-
+          
           {/* Bottom Navigation for Steps 1, 2, and 3 */}
           {(currentStep !== 4 && currentStep !== 5 && currentStep !== 6) && (
             <div className={`flex ${
@@ -289,7 +348,6 @@ export default function AssistPage() {
               (currentStep === 2 && !providerType) || 
               (currentStep === 3 && !selectedPlan) ? 'justify-start' : 'justify-between'
             } mt-8 pt-6 border-t border-[var(--border)]`}>
-
               <button
                 onClick={handleBack}
                 className="px-6 py-3 bg-[var(--secondary)] text-[var(--secondary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"

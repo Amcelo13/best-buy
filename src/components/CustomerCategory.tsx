@@ -5,6 +5,7 @@ import { CheckIcon } from './Icons';
 interface CustomerCategoryProps {
   selectedCategory: string | null;
   setSelectedCategory: (category: string | null) => void;
+  provider?: string;
 }
 
 const categoryOptions = [
@@ -14,10 +15,16 @@ const categoryOptions = [
   { id: 'small-business', name: 'Small Business', description: 'Small business solutions' }
 ];
 
+const virginCategoryOptions = [
+  { id: 'consumer', name: 'Consumer', description: 'Personal use customers' }
+];
+
 export default function CustomerCategory({
   selectedCategory,
   setSelectedCategory,
+  provider = 'bell' // Default to bell if not provided
 }: CustomerCategoryProps) {
+  const options = provider?.toLowerCase() === 'virgin' ? virginCategoryOptions : categoryOptions;
   return (
     <div className="space-y-8">
       <h2 className="text-2xl font-bold text-center text-[var(--foreground)] mb-8">
@@ -25,7 +32,7 @@ export default function CustomerCategory({
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
-        {categoryOptions.map((category) => (
+        {options.map((category) => (
           <div
             key={category.id}
             onClick={() => setSelectedCategory(category.id)}
@@ -61,7 +68,7 @@ export default function CustomerCategory({
           <div className="flex items-center justify-center gap-2">
             <CheckIcon className="text-[var(--primary)]" size={20} />
             <p className="text-center text-[var(--foreground)] font-medium">
-              Selected: {categoryOptions.find(cat => cat.id === selectedCategory)?.name}
+              Selected: {options.find(cat => cat.id === selectedCategory)?.name}
             </p>
           </div>
         </div>

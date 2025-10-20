@@ -284,7 +284,13 @@ export default function DeviceSelection({
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
-                    target.parentElement!.innerHTML = `<div class="text-[var(--muted-foreground)] text-sm">No Image</div>`;
+                    const parent = target.parentElement;
+                    if (parent) {
+                      const errorDiv = document.createElement('div');
+                      errorDiv.className = 'text-[var(--muted-foreground)] text-sm';
+                      errorDiv.textContent = 'No Image';
+                      parent.appendChild(errorDiv);
+                    }
                   }}
                 />
               </div>
