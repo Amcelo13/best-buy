@@ -40,7 +40,7 @@ function DraggableProvider({ id, name, logo }: { id: string; name: string; logo:
       <div className="flex justify-center mb-3">
         <Image src={logo} alt={name} width={100} height={60} className="object-contain" />
       </div>
-      <h3 className="text-lg font-bold text-center text-[var(--foreground)]">{name}</h3>
+      {/* <h3 className="text-lg font-bold text-center text-[var(--foreground)]">{name}</h3> */}
     </div>
   );
 }
@@ -83,7 +83,7 @@ function DropZone({
               className="object-contain"
             />
           </div>
-          <h3 className="text-xl font-bold text-[var(--primary)] mb-2">{droppedProvider.name}</h3>
+          {/* <h3 className="text-xl font-bold text-[var(--primary)] mb-2">{droppedProvider.name}</h3> */}
           <p className="text-sm text-[var(--muted-foreground)]">{type}</p>
           <CheckIcon className="text-[var(--primary)] mt-2" size={24} />
         </div>
@@ -217,9 +217,9 @@ export default function ProviderSelection({
                 className="object-contain"
               />
             </div>
-            <h3 className="text-lg font-bold text-center text-[var(--foreground)]">
+            {/* <h3 className="text-lg font-bold text-center text-[var(--foreground)]">
               {activeProvider.name}
-            </h3>
+            </h3> */}
           </div>
         ) : null}
       </DragOverlay>

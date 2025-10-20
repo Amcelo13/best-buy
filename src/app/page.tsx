@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { DashboardIcon, OfferIcon, AssistIcon, QuizIcon, HotOffersIcon } from '@/components/Icons';
+import { DashboardIcon, OfferIcon, AssistIcon, QuizIcon, HotOffersIcon, SimulationIcon } from '@/components/Icons';
 
 export default function Home() {
   const tiles = [
@@ -8,7 +8,8 @@ export default function Home() {
     { name: 'OfferGrid', href: '/assets/Offer Grid.xlsx', Icon: OfferIcon },
     { name: 'Assist', href: '/assist', Icon: AssistIcon },
     { name: 'Quiz', href: '/quiz', Icon: QuizIcon },
-    { name: 'Hot Offers', href: '/hot-offers', Icon: HotOffersIcon },
+    { name: 'Axonify', href: '/axonify', Icon: HotOffersIcon },
+    {name: 'SIMU', href: '/simu', Icon: SimulationIcon }
   ];
 
   return (

@@ -31,7 +31,7 @@ export default function HotOffersPage() {
             <div className="flex justify-center mb-6 text-[var(--primary)]">
               <HotOffersIcon size={80} />
             </div>
-            <h2 className="text-3xl font-bold text-[var(--foreground)] mb-4">Hot Offers</h2>
+            <h2 className="text-3xl font-bold text-[var(--foreground)] mb-4">AXINIFY</h2>
             <p className="text-[var(--muted-foreground)]">Check out our hottest deals and offers!</p>
           </div>
         </div>
