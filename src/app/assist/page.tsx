@@ -8,19 +8,7 @@ import PlanOptions from '@/components/PlanOptions';
 import CustomerCategory from '@/components/CustomerCategory';
 import DeviceSelection from '@/components/DeviceSelection';
 import EnhancedSubscriberCount, { type Subscriber } from '@/components/EnhancedSubscriberCount';
-
-// Define Device interface to match DeviceSelection component
-interface Device {
-  id: string;
-  name: string;
-  brand: string;
-  model: string;
-  color: string;
-  storage: string;
-  price: number;
-  image: string;
-  category: string;
-}
+import { type Device } from '@/constants/devices';
 
 export default function AssistPage() {
   const [currentStep, setCurrentStep] = useState(1);

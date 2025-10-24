@@ -3,116 +3,14 @@
 import { useState } from 'react';
 import { CheckIcon } from './Icons';
 import Image from 'next/image';
-
-interface Device {
-  id: string;
-  name: string;
-  brand: string;
-  model: string;
-  color: string;
-  storage: string;
-  price: number;
-  image: string;
-  category: string;
-}
+import { DEVICES, type Device } from '@/constants/devices';
 
 interface DeviceSelectionProps {
   selectedDevice: Device | null;
   setSelectedDevice: (device: Device | null) => void;
 }
 
-const devices: Device[] = [
-  // iPhones
-  {
-    id: 'iphone-15-pro-max-256gb-black',
-    name: 'iPhone 15 Pro Max',
-    brand: 'Apple',
-    model: 'iPhone 15 Pro Max',
-    color: 'Natural Titanium',
-    storage: '256GB',
-    price: 1199,
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-max-naturaltitanium-select?wid=470&hei=556&fmt=png-alpha&.v=1692895855329',
-    category: 'smartphone'
-  },
-  {
-    id: 'iphone-15-128gb-pink',
-    name: 'iPhone 15',
-    brand: 'Apple',
-    model: 'iPhone 15',
-    color: 'Pink',
-    storage: '128GB',
-    price: 799,
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pink-select-202309?wid=470&hei=556&fmt=png-alpha&.v=1692895856458',
-    category: 'smartphone'
-  },
-  {
-    id: 'iphone-14-128gb-blue',
-    name: 'iPhone 14',
-    brand: 'Apple',
-    model: 'iPhone 14',
-    color: 'Blue',
-    storage: '128GB',
-    price: 699,
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-blue-select-2022?wid=470&hei=556&fmt=png-alpha&.v=1660780435012',
-    category: 'smartphone'
-  },
-  {
-    id: 'iphone-13-128gb-midnight',
-    name: 'iPhone 13',
-    brand: 'Apple',
-    model: 'iPhone 13',
-    color: 'Midnight',
-    storage: '128GB',
-    price: 599,
-    image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-13-midnight-select-2021?wid=470&hei=556&fmt=png-alpha&.v=1645572315424',
-    category: 'smartphone'
-  },
-  // Samsung Phones
-  {
-    id: 'galaxy-s24-ultra-256gb-titanium',
-    name: 'Galaxy S24 Ultra',
-    brand: 'Samsung',
-    model: 'Galaxy S24 Ultra',
-    color: 'Titanium Gray',
-    storage: '256GB',
-    price: 1199,
-    image: 'https://images.samsung.com/is/image/samsung/p6pim/ca/2401/gallery/ca-galaxy-s24-s928-sm-s928wzaaxac-thumb-539573072',
-    category: 'smartphone'
-  },
-  {
-    id: 'galaxy-s24-128gb-violet',
-    name: 'Galaxy S24',
-    brand: 'Samsung',
-    model: 'Galaxy S24',
-    color: 'Cobalt Violet',
-    storage: '128GB',
-    price: 799,
-    image: 'https://images.samsung.com/is/image/samsung/p6pim/ca/2401/gallery/ca-galaxy-s24-s921-sm-s921bzvcxac-thumb-539573041',
-    category: 'smartphone'
-  },
-  {
-    id: 'galaxy-a54-128gb-black',
-    name: 'Galaxy A54 5G',
-    brand: 'Samsung',
-    model: 'Galaxy A54',
-    color: 'Awesome Graphite',
-    storage: '128GB',
-    price: 449,
-    image: 'https://images.samsung.com/is/image/samsung/p6pim/ca/2303/gallery/ca-galaxy-a54-5g-a546-sm-a546vzkcxac-thumb-535406925',
-    category: 'smartphone'
-  },
-  {
-    id: 'galaxy-z-flip5-256gb-mint',
-    name: 'Galaxy Z Flip5',
-    brand: 'Samsung',
-    model: 'Galaxy Z Flip5',
-    color: 'Mint',
-    storage: '256GB',
-    price: 999, 
-    image: 'https://images.samsung.com/is/image/samsung/p6pim/ca/2307/gallery/ca-galaxy-z-flip5-f731-sm-f731bzgcxac-thumb-537515739',
-    category: 'smartphone'
-  }
-];
+const devices = DEVICES;
 
 export default function DeviceSelection({
   selectedDevice,
