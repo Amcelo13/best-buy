@@ -41,8 +41,14 @@ export default function Home() {
               href={tile.href}
               target={tile.href.endsWith('.pdf') || tile.href.endsWith('.xlsx') ? '_blank' : undefined}
               rel={tile.href.endsWith('.pdf') || tile.href.endsWith('.xlsx') ? 'noopener noreferrer' : undefined}
-              className="group bg-[var(--card)] rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 p-6  sm:p-8 md:p-10 flex flex-col items-center justify-center space-y-4 border border-[var(--border)] h-full min-h-[150px] sm:min-h-[180px] md:min-h-[160px]"
+              className="group bg-[var(--card)] rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 p-6  sm:p-8 md:p-10 flex flex-col items-center justify-center space-y-4 border border-[var(--border)] h-full min-h-[150px] sm:min-h-[180px] md:min-h-[160px] relative"
             >
+              {/* Badge for Plan Grid and OfferGrid */}
+              {(tile.name === 'Plan Grid ' || tile.name === 'OfferGrid') && (
+                <div className="absolute top-3 right-3 bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold shadow-lg">
+                  1
+                </div>
+              )}
               <div className="text-[var(--primary)] group-hover:scale-110 transition-transform duration-300">
                 <tile.Icon className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16" />
               </div>
