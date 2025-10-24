@@ -284,14 +284,10 @@ export default function AssistPage() {
                             <span className="inline-flex items-center rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium">Max Data</span>
                           </div>
                           <div className="p-6">
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-5">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-5">
                               <div className="text-center">
                                 <div className="text-2xl font-bold text-blue-600">{submissionResult.data.bestDataPlan.data}</div>
                                 <div className="text-sm text-gray-500">Data</div>
-                              </div>
-                              <div className="text-center">
-                                <div className="text-2xl font-bold text-blue-600">${submissionResult.data.bestDataPlan.linePrice}</div>
-                                <div className="text-sm text-gray-500">Per-line Price</div>
                               </div>
                               <div className="text-center">
                                 <div className="text-2xl font-bold text-blue-600">${submissionResult.data.bestDataPlan.totalCost}</div>
@@ -338,14 +334,10 @@ export default function AssistPage() {
                             <span className="inline-flex items-center rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium">Best Price</span>
                           </div>
                           <div className="p-6">
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-5">
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-5">
                               <div className="text-center">
                                 <div className="text-2xl font-bold text-green-600">{submissionResult.data.bestPricePlan.data}</div>
                                 <div className="text-sm text-gray-500">Data</div>
-                              </div>
-                              <div className="text-center">
-                                <div className="text-2xl font-bold text-green-600">${submissionResult.data.bestPricePlan.linePrice}</div>
-                                <div className="text-sm text-gray-500">Per-line Price</div>
                               </div>
                               <div className="text-center">
                                 <div className="text-2xl font-bold text-green-600">${submissionResult.data.bestPricePlan.totalCost}</div>

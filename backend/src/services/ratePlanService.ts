@@ -133,15 +133,42 @@ const calculateTotalCost = (plan: RatePlan, lines: number): number => {
   return total;
 };
 
-const findBestDataPlan = (plans: RatePlan[], lines: number): any => {
+// Normalize roaming string for consistent comparison
+const normalizeRoaming = (r?: string): string => {
+  if (!r) return '';
+  return r.toString().trim().toUpperCase().replace(/\s+/g, ' ');
+};
+
+const findBestDataPlan = (plans: RatePlan[], lines: number, formData?: AssistFormData): any => {
   if (plans.length === 0) {
     return null;
   }
   
+  const planType = (formData?.selectedPlan || '').toLowerCase();
+  
+  // Filter out international roaming plans first
+  const nonIntPlans = plans.filter(plan => {
+    const roaming = normalizeRoaming(plan.ROAMING);
+    return roaming !== 'INT';
+  });
+  
+  // Use filtered plans if available, otherwise fallback to all plans
+  const filteredPlans = nonIntPlans.length > 0 ? nonIntPlans : plans;
+  
   // Convert data to GB for comparison
-  const planWithDataGB = plans.map(plan => {
-    const dataStr = plan.DATA || '0GB';
-    const dataGB = parseInt(dataStr.replace('GB', '')) || 0;
+  const planWithDataGB = filteredPlans.map(plan => {
+    const dataStr = (plan.DATA || '').toString().trim();
+    let dataGB = 0;
+    
+    // Handle different data formats
+    if (dataStr && dataStr !== '-' && dataStr !== 'N/A' && dataStr !== '') {
+      // Extract number from strings like "50GB", "100 GB", etc.
+      const match = dataStr.match(/(\d+\.?\d*)\s*GB/i);
+      if (match) {
+        dataGB = parseFloat(match[1]);
+      }
+    }
+    
     const totalCost = calculateTotalCost(plan, lines);
     return {
       ...plan,
@@ -150,10 +177,37 @@ const findBestDataPlan = (plans: RatePlan[], lines: number): any => {
     };
   });
 
-  // Find plan with highest data
-  const bestDataPlan = planWithDataGB.reduce((best, current) => 
-    current.dataGB > best.dataGB ? current : best
-  );
+  let bestDataPlan;
+  
+  // For talk/text plans, prioritize plans with no data ("-")
+  if (planType.includes('talk')) {
+    const noDataPlans = planWithDataGB.filter(p => p.dataGB === 0);
+    if (noDataPlans.length > 0) {
+      // Get the cheapest plan with no data
+      bestDataPlan = noDataPlans.reduce((best, current) => 
+        current.totalCost < best.totalCost ? current : best
+      );
+    } else {
+      // Fallback to cheapest plan overall
+      bestDataPlan = planWithDataGB.reduce((best, current) => 
+        current.totalCost < best.totalCost ? current : best
+      );
+    }
+  } else {
+    // For data plans, get the one with highest data
+    const plansWithData = planWithDataGB.filter(p => p.dataGB > 0);
+    
+    if (plansWithData.length > 0) {
+      bestDataPlan = plansWithData.reduce((best, current) => 
+        current.dataGB > best.dataGB ? current : best
+      );
+    } else {
+      // If no data plans found, use the cheapest plan with "-" (no data)
+      bestDataPlan = planWithDataGB.reduce((best, current) => 
+        current.totalCost < best.totalCost ? current : best
+      );
+    }
+  }
 
   // Calculate line-by-line pricing
   const linePricing = [];
@@ -167,7 +221,7 @@ const findBestDataPlan = (plans: RatePlan[], lines: number): any => {
   return {
     planName: `${bestDataPlan.TERM} ${bestDataPlan.TIER}`,
     tier: bestDataPlan.TIER,
-    data: bestDataPlan.DATA,
+    data: bestDataPlan.DATA || '-',
     roaming: bestDataPlan.ROAMING || 'N/A',
     socCode: bestDataPlan['SOC CODE'],
     activity: bestDataPlan.ACTIVITY,
@@ -179,11 +233,69 @@ const findBestDataPlan = (plans: RatePlan[], lines: number): any => {
   };
 };
 
-const findBestPricePlan = (plans: RatePlan[], lines: number): any => {
+const findBestPricePlan = (plans: RatePlan[], lines: number, formData?: AssistFormData): any => {
   if (plans.length === 0) return null;
+
+  const isByod = (formData?.providerType || '').toLowerCase() === 'byod';
+  const planType = (formData?.selectedPlan || '').toLowerCase();
+
+  let candidates = plans;
+
+  if (isByod) {
+    const allowedRoaming = new Set(['', '-', 'US', 'US / MX', 'US/MX']);
+
+    if (planType.includes('talk')) {
+      // Talk & Text: prefer BYOD plans with no data ("-") and avoid INT roaming
+      candidates = plans.filter(p => {
+        const dataStr = (p.DATA ?? '').toString().trim().toUpperCase();
+        const isNoData = dataStr === '' || dataStr === '-' || dataStr === 'N/A';
+        const roaming = normalizeRoaming(p.ROAMING);
+        const isInt = roaming === 'INT';
+        return isNoData && !isInt;
+      });
+
+      // If none matched strictly no-data, relax to any non-INT BYOD plan
+      if (candidates.length === 0) {
+        candidates = plans.filter(p => {
+          const roaming = normalizeRoaming(p.ROAMING);
+          return roaming !== 'INT';
+        });
+      }
+    } else if (planType.includes('data')) {
+      // Data-centric: require tangible data and avoid INT roaming
+      candidates = plans.filter(p => {
+        const dataStr = (p.DATA || '').toString().toUpperCase();
+        const hasData = /\d+\s*GB/.test(dataStr);
+        const roaming = normalizeRoaming(p.ROAMING);
+        const roamingAllowed = allowedRoaming.has(roaming);
+        const isInt = roaming === 'INT';
+        return hasData && !isInt && (roamingAllowed || roaming === '');
+      });
+      
+      // If no data plans found, fallback to plans with "-"
+      if (candidates.length === 0) {
+        candidates = plans.filter(p => {
+          const dataStr = (p.DATA ?? '').toString().trim().toUpperCase();
+          const roaming = normalizeRoaming(p.ROAMING);
+          return (dataStr === '-' || dataStr === '') && roaming !== 'INT';
+        });
+      }
+    } else {
+      // Combined or other: prefer plans with data but allow no-data fallback
+      candidates = plans.filter(p => {
+        const roaming = normalizeRoaming(p.ROAMING);
+        return roaming !== 'INT';
+      });
+    }
+  }
+
+  // If filtering removed everything, fallback to original list to avoid hard failure
+  if (candidates.length === 0) {
+    candidates = plans;
+  }
   
-  // Calculate total cost for each plan
-  const planWithCosts = plans.map(plan => ({
+  // Calculate total cost for each candidate
+  const planWithCosts = candidates.map(plan => ({
     ...plan,
     totalCost: calculateTotalCost(plan, lines)
   }));
@@ -205,7 +317,7 @@ const findBestPricePlan = (plans: RatePlan[], lines: number): any => {
   return {
     planName: `${bestPricePlan.TERM} ${bestPricePlan.TIER}`,
     tier: bestPricePlan.TIER,
-    data: bestPricePlan.DATA,
+    data: bestPricePlan.DATA || '-',
     roaming: bestPricePlan.ROAMING || 'N/A',
     socCode: bestPricePlan['SOC CODE'],
     activity: bestPricePlan.ACTIVITY,
@@ -236,7 +348,7 @@ export const submitAssistForm = async (
 
     // Get the appropriate rate plan file based on category
     const filePath = RATE_PLAN_FILES[formData.selectedProvider]?.[formData.selectedCategory];
-    
+
     if (!filePath) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -257,29 +369,32 @@ export const submitAssistForm = async (
 
     const lines = formData.lines || 1;
 
-    // Find best data and best price plans
-    const bestDataPlan = findBestDataPlan(filteredPlans, lines);
-    const bestPricePlan = findBestPricePlan(filteredPlans, lines);
+    // Always calculate both best data plan and best price plan
+    const bestDataPlan = findBestDataPlan(filteredPlans, lines, formData);
+    const bestPricePlan = findBestPricePlan(filteredPlans, lines, formData);
 
-    // Prepare response with the actual form data and calculated plans
+    if (!bestDataPlan && !bestPricePlan) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: 'Unable to determine best plans'
+      });
+    }
+
+    // Generate a unique ID for this submission
+    const submissionId = `SUB-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
     const response = {
       success: true,
       data: {
-        id: Date.now().toString(),
+        id: submissionId,
         selectedProvider: formData.selectedProvider,
         customerType: formData.customerType,
-        providerType: formData.providerType,
-        selectedPlan: formData.selectedPlan,
         selectedCategory: formData.selectedCategory,
-        selectedDevice: formData.selectedDevice || null,
-        subscriberCount: formData.subscriberCount || 1,
-        subscriberList: formData.subscriberList || [],
-        lines: lines,
-        data: formData.data || '',
-        talk: formData.talk || '',
-        text: formData.text || '',
-        bestDataPlan,
-        bestPricePlan,
+        providerType: formData.providerType,
+        selectedPlanType: formData.selectedPlan,
+        lines,
+        bestDataPlan: bestDataPlan,
+        bestPricePlan: bestPricePlan,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
