@@ -57,25 +57,48 @@ const readRatePlans = (filePath: string): RatePlan[] => {
 };
 
 const filterPlans = (plans: RatePlan[], formData: AssistFormData): RatePlan[] => {
-  return plans.filter(plan => {
-    // Filter by provider type (BYOD vs SMARTPAY)
-    if (formData.providerType === 'byod' && plan.TERM !== 'BYOD') {
-      return false;
-    }
-    if (formData.providerType !== 'byod' && plan.TERM === 'BYOD') {
-      return false;
+  const isByod = (formData.providerType || '').toLowerCase() === 'byod';
+
+  // Primary filter with robust BYOD/BYOP detection and optional roaming filter
+  let filtered = plans.filter(plan => {
+    const termRaw = (plan.TERM ?? '').toString().toLowerCase();
+    const isByodTerm = termRaw.includes('byod') || termRaw.includes('byop') || termRaw.includes('bring your own');
+
+    // Provider type filtering
+    if (isByod) {
+      // Accept when clearly BYOD or when TERM is missing/ambiguous (some sheets omit TERM)
+      if (!(isByodTerm || termRaw.trim() === '')) return false;
+    } else {
+      // Non-BYOD: exclude explicit BYOD/BYOP terms
+      if (isByodTerm) return false;
     }
 
-    // Filter by plan type - if user selected "data", exclude international roaming plans
-    if (formData.selectedPlan === 'data' && plan.ROAMING && plan.ROAMING === 'INT') {
-      return false;
+    // Optional roaming filter for explicit data-only selection
+    if ((formData.selectedPlan || '').toLowerCase() === 'data') {
+      // Only exclude international roaming when clearly marked as such; tolerate blanks
+      const roaming = (plan.ROAMING ?? '').toString().toUpperCase();
+      if (roaming === 'INT') return false;
     }
-
-    // For talk-text plans, we can include all plans as they typically have talk and text
-    // No additional filtering needed for talk-text plans
 
     return true;
   });
+
+  // Fallback 1: if nothing matched, relax roaming constraint and only keep provider type
+  if (filtered.length === 0) {
+    filtered = plans.filter(plan => {
+      const termRaw = (plan.TERM ?? '').toString().toLowerCase();
+      const isByodTerm = termRaw.includes('byod') || termRaw.includes('byop') || termRaw.includes('bring your own');
+      if (isByod) return (isByodTerm || termRaw.trim() === '');
+      return !isByodTerm;
+    });
+  }
+
+  // Fallback 2: if still empty, return all plans to avoid hard failure; ranking will pick best
+  if (filtered.length === 0) {
+    return plans;
+  }
+
+  return filtered;
 };
 
 const getLinePrice = (plan: RatePlan, lineNumber: number): number => {
