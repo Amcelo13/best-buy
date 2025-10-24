@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { AssistFormData } from '../types/assist.types';
+import { submitAssistForm as submitAssistFormService } from '../services/ratePlanService';
 
 // In a real application, you would use a database
 const submissions: AssistFormData[] = [];
@@ -10,35 +11,8 @@ export const submitAssistForm = async (
   res: Response,
   next: NextFunction
 ) => {
-  try {
-    const formData: AssistFormData = req.body;
-    console.log('Form Data:', formData);
-    // Basic validation
-    if (!formData.selectedProvider || !formData.customerType || !formData.providerType) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        success: false,
-        message: 'Missing required fields'
-      });
-    }
-
-    // In a real app, you would save to a database here
-    submissions.push(formData);
-    
-    // Return the created submission with an ID
-    const submission = {
-      id: Date.now().toString(),
-      ...formData,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    return res.status(StatusCodes.CREATED).json({
-      success: true,
-      data: submission
-    });
-  } catch (error) {
-    next(error);
-  }
+  // Use the rate plan service to handle the form submission
+  return submitAssistFormService(req, res, next);
 };
 
 export const getAssistSubmissions = async (

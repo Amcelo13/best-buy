@@ -209,8 +209,9 @@ export default function AssistPage() {
     }
   };
 
-  // Calculate total price from submission result
+  // Calculate total price from submission result (if pricing data is available)
   const getTotalPrice = () => {
+    // Since the current response doesn't include pricing, return 0 or handle accordingly
     if (!submissionResult?.data?.plans?.length) return 0;
     return submissionResult.data.plans.reduce((sum: number, plan: any) => sum + (plan.totalPrice || 0), 0);
   };
@@ -264,55 +265,136 @@ export default function AssistPage() {
                 </div>
 
                 {submissionResult?.data && (
-                  <div
-                    className={`p-6 rounded-lg mb-6 ${submissionResult?.data?.provider?.toLowerCase() === 'bell'
-                        ? 'bg-blue-50'
-                        : 'bg-red-50'
-                      }`}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-lg font-semibold">
-                        {submissionResult.data.provider} - {submissionResult.data.customerType}
+                  <div className="space-y-6">
+                    {/* Header */}
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <h4 className="text-lg font-semibold capitalize">
+                        {submissionResult.data.selectedProvider} - {submissionResult.data.customerType} ({submissionResult.data.selectedCategory})
                       </h4>
-                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-white">
-                        {submissionResult.data.lines}{' '}
-                        {submissionResult.data.lines > 1 ? 'Lines' : 'Line'}
+                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-white border">
+                        {submissionResult.data.lines} {submissionResult.data.lines > 1 ? 'Lines' : 'Line'}
                       </span>
                     </div>
 
-                    <div className="space-y-4">
-                      {submissionResult.data.plans?.map((plan: any, index: number) => (
-                        <div key={index} className="bg-white p-4 rounded-lg shadow">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <h5 className="font-medium">{plan.planName}</h5>
-                              <div className="text-sm text-gray-500">
-                                {plan.data && <div>Data: {plan.data}</div>}
-                                {plan.talk && <div>Talk: {plan.talk}</div>}
-                                {plan.text && <div>Text: {plan.text}</div>}
-                                <div>Contract: {plan.contractTerm}</div>
+                    {/* Best Data Plan */}
+                    {submissionResult.data.bestDataPlan && (
+                      <div className="bg-white border rounded-lg overflow-hidden">
+                        <div className="bg-blue-600 text-white px-4 py-3">
+                          <h5 className="font-semibold text-lg">Best Data Option</h5>
+                        </div>
+                        <div className="p-6">
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-blue-600">{submissionResult.data.bestDataPlan.data}</div>
+                              <div className="text-sm text-gray-500">Data</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-blue-600">${submissionResult.data.bestDataPlan.linePrice}</div>
+                              <div className="text-sm text-gray-500">Line 1 Price</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-blue-600">${submissionResult.data.bestDataPlan.totalCost}</div>
+                              <div className="text-sm text-gray-500">Total Cost ({submissionResult.data.bestDataPlan.lines} line{submissionResult.data.bestDataPlan.lines > 1 ? 's' : ''})</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-lg font-semibold text-gray-700">{submissionResult.data.bestDataPlan.tier}</div>
+                              <div className="text-sm text-gray-500">Plan Tier</div>
+                            </div>
+                          </div>
+                          
+                          {/* Line-by-line breakdown */}
+                          {submissionResult.data.bestDataPlan.lines > 1 && submissionResult.data.bestDataPlan.linePricing && (
+                            <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                              <h6 className="font-semibold mb-2">Line Breakdown</h6>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                                {submissionResult.data.bestDataPlan.linePricing.map((line: any) => (
+                                  <div key={line.lineNumber} className="text-center p-2 bg-white rounded border">
+                                    <div className="font-medium text-blue-600">Line {line.lineNumber}</div>
+                                    <div className="text-sm">${line.price}</div>
+                                  </div>
+                                ))}
                               </div>
                             </div>
-                            <div className="text-right">
-                              <div className="font-medium">${plan.linePrice}/line</div>
-                              {submissionResult.data.lines > 1 && (
-                                <div className="text-sm text-gray-500">
-                                  {submissionResult.data.lines} × ${plan.linePrice} = ${plan.totalPrice}
-                                </div>
-                              )}
+                          )}
+                          <div className="bg-blue-50 p-4 rounded-lg">
+                            <h6 className="font-semibold mb-2">Plan Details</h6>
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                              <div><span className="font-medium">Plan:</span> {submissionResult.data.bestDataPlan.planName}</div>
+                              <div><span className="font-medium">SOC Code:</span> {submissionResult.data.bestDataPlan.socCode}</div>
+                              <div><span className="font-medium">Activity:</span> {submissionResult.data.bestDataPlan.activity}</div>
+                              <div><span className="font-medium">Roaming:</span> {submissionResult.data.bestDataPlan.roaming}</div>
                             </div>
                           </div>
                         </div>
-                      ))}
+                      </div>
+                    )}
 
-                      {submissionResult.data.plans?.length > 1 && (
-                        <div className="flex justify-between items-center pt-4 mt-4 border-t border-gray-200">
-                          <span className="font-semibold">Total Monthly Cost</span>
-                          <span className="text-xl font-bold">
-                            ${getTotalPrice().toFixed(2)}
-                          </span>
+                    {/* Best Price Plan */}
+                    {submissionResult.data.bestPricePlan && (
+                      <div className="bg-white border rounded-lg overflow-hidden">
+                        <div className="bg-green-600 text-white px-4 py-3">
+                          <h5 className="font-semibold text-lg">Best Price Option</h5>
                         </div>
-                      )}
+                        <div className="p-6">
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-green-600">{submissionResult.data.bestPricePlan.data}</div>
+                              <div className="text-sm text-gray-500">Data</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-green-600">${submissionResult.data.bestPricePlan.linePrice}</div>
+                              <div className="text-sm text-gray-500">Line 1 Price</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-green-600">${submissionResult.data.bestPricePlan.totalCost}</div>
+                              <div className="text-sm text-gray-500">Total Cost ({submissionResult.data.bestPricePlan.lines} line{submissionResult.data.bestPricePlan.lines > 1 ? 's' : ''})</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-lg font-semibold text-gray-700">{submissionResult.data.bestPricePlan.tier}</div>
+                              <div className="text-sm text-gray-500">Plan Tier</div>
+                            </div>
+                          </div>
+                          
+                          {/* Line-by-line breakdown */}
+                          {submissionResult.data.bestPricePlan.lines > 1 && submissionResult.data.bestPricePlan.linePricing && (
+                            <div className="bg-green-50 p-4 rounded-lg mb-4">
+                              <h6 className="font-semibold mb-2">Line Breakdown</h6>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                                {submissionResult.data.bestPricePlan.linePricing.map((line: any) => (
+                                  <div key={line.lineNumber} className="text-center p-2 bg-white rounded border">
+                                    <div className="font-medium text-green-600">Line {line.lineNumber}</div>
+                                    <div className="text-sm">${line.price}</div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          <div className="bg-green-50 p-4 rounded-lg">
+                            <h6 className="font-semibold mb-2">Plan Details</h6>
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                              <div><span className="font-medium">Plan:</span> {submissionResult.data.bestPricePlan.planName}</div>
+                              <div><span className="font-medium">SOC Code:</span> {submissionResult.data.bestPricePlan.socCode}</div>
+                              <div><span className="font-medium">Activity:</span> {submissionResult.data.bestPricePlan.activity}</div>
+                              <div><span className="font-medium">Roaming:</span> {submissionResult.data.bestPricePlan.roaming}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Submission Details */}
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h5 className="font-semibold mb-3 text-gray-700">Submission Details</h5>
+                      <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                        <div>
+                          <span className="font-medium">Submission ID:</span>
+                          <div className="font-mono text-xs">{submissionResult.data.id}</div>
+                        </div>
+                        <div>
+                          <span className="font-medium">Created:</span>
+                          <div>{new Date(submissionResult.data.createdAt).toLocaleString()}</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
