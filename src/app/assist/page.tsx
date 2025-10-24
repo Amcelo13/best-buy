@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 import ProviderSelection from '@/components/ProviderSelection';
 import ProviderTypeSelection from '@/components/ProviderTypeSelection';
 import PlanOptions from '@/components/PlanOptions';
@@ -9,52 +11,78 @@ import CustomerCategory from '@/components/CustomerCategory';
 import DeviceSelection from '@/components/DeviceSelection';
 import EnhancedSubscriberCount, { type Subscriber } from '@/components/EnhancedSubscriberCount';
 import { type Device } from '@/constants/devices';
+import { submitAssistForm } from '@/services/assistService';
+import { type AssistFormData, type CustomerType, type ProviderType } from '@/types/assist.types';
 
 export default function AssistPage() {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
-  const [customerType, setCustomerType] = useState<'new' | 'existing' | null>(null);
-  const [providerType, setProviderType] = useState<'byod' | 'smartpay' | null>(null);
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
+  
+  // Centralized form state
+  const [formData, setFormData] = useState<Omit<AssistFormData, 'subscriberCount' | 'subscriberList'>>({
+    selectedProvider: null,
+    customerType: null,
+    providerType: null,
+    selectedPlan: null,
+    selectedCategory: null,
+    selectedDevice: null,
+  });
+  
   const [subscriberCount, setSubscriberCount] = useState(1);
   const [subscriberList, setSubscriberList] = useState<Subscriber[]>([]);
+  
+  // Destructure form data for easier access
+  const { 
+    selectedProvider, 
+    customerType, 
+    providerType, 
+    selectedPlan, 
+    selectedCategory, 
+    selectedDevice 
+  } = formData;
+
+  const updateFormData = useCallback((updates: Partial<AssistFormData>) => {
+    setFormData(prev => ({
+      ...prev,
+      ...updates
+    }));
+  }, []);
 
   const handleProviderSelection = (provider: string | null) => {
-    setSelectedProvider(provider);
+    updateFormData({ selectedProvider: provider });
     // Auto-advance to step 2 when provider is dropped
     if (provider) {
       setTimeout(() => setCurrentStep(2), 800);
     }
   };
 
-  const handleCustomerTypeSelection = (type: 'new' | 'existing' | null) => {
-    setCustomerType(type);
+  const handleCustomerTypeSelection = (type: CustomerType) => {
+    updateFormData({ customerType: type });
   };
 
-  const handleProviderTypeSelection = (type: 'byod' | 'smartpay' | null) => {
-    setProviderType(type);
+  const handleProviderTypeSelection = (type: ProviderType) => {
+    updateFormData({ providerType: type });
     // Auto-advance to step 3 when provider type is selected
     if (type) {
       setTimeout(() => setCurrentStep(3), 500);
     }
   };
 
-  const handlePlanSelection = (plan: string | null) => {
-    setSelectedPlan(plan);
-    // Auto-advance to step 4 when plan is selected
+  const handlePlanSelection = async (plan: string | null) => {
+    updateFormData({ selectedPlan: plan });
+    
     if (plan) {
       // Auto-select consumer category for Virgin
       if (selectedProvider?.toLowerCase() === 'virgin') {
-        setSelectedCategory('consumer');
+        updateFormData({ selectedCategory: 'consumer' });
       }
       setTimeout(() => setCurrentStep(4), 500);
     }
   };
 
   const handleCategorySelection = (category: string | null) => {
-    setSelectedCategory(category);
+    updateFormData({ selectedCategory: category });
     if (category && providerType !== 'byod') {
       setTimeout(() => setCurrentStep(6), 500);
     }
@@ -62,13 +90,36 @@ export default function AssistPage() {
 
   const handleAddAnotherSubscriber = () => {
     setCurrentStep(2);
-    setProviderType(null); // Reset provider type selection
-    setSelectedPlan(null); // Reset plan selection
+    updateFormData({ 
+      providerType: null,
+      selectedPlan: null 
+    });
   };
 
   const handleDeviceSelection = (device: Device | null) => {
-    setSelectedDevice(device);
-    // Device selection is now the final step, no auto-advance
+    updateFormData({ selectedDevice: device });
+  };
+  
+  const handleSubmit = async () => {
+    try {
+      setIsSubmitting(true);
+      const formSubmission: AssistFormData = {
+        ...formData,
+        subscriberCount,
+        subscriberList
+      };
+      
+      await submitAssistForm(formSubmission);
+      
+      toast.success('Form submitted successfully!');
+      // Redirect or show success message
+      router.push('/success');
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to submit form');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleNext = () => {
@@ -127,26 +178,26 @@ export default function AssistPage() {
       // For Virgin, go back to step 4 (skip category selection)
       if (selectedProvider?.toLowerCase() === 'virgin') {
         setCurrentStep(4);
-        setSelectedDevice(null); // Reset device selection
+        updateFormData({ selectedDevice: null });
       } else {
         setCurrentStep(5);
-        setSelectedDevice(null); // Reset device selection
+        updateFormData({ selectedDevice: null });
       }
     } else if (currentStep === 5) {
       setCurrentStep(4);
-      setSelectedCategory(null); // Reset category selection
+      updateFormData({ selectedCategory: null });
     } else if (currentStep === 4) {
       // Go back to subscribers step
       setCurrentStep(3);
     } else if (currentStep === 3) {
       setCurrentStep(2);
-      setSelectedPlan(null); // Reset plan selection
+      updateFormData({ selectedPlan: null });
     } else if (currentStep === 2) {
       setCurrentStep(1);
-      setProviderType(null); // Reset provider type selection
+      updateFormData({ providerType: null });
     } else if (currentStep === 1) {
       // Go back to home
-      window.location.href = '/';
+      router.push('/');
     }
   };
 
@@ -265,10 +316,10 @@ export default function AssistPage() {
               
               {currentStep === 4 && (
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     // Virgin + BYOD ends at step 4
                     if (selectedProvider?.toLowerCase() === 'virgin' && providerType === 'byod') {
-                      alert('Process completed!');
+                      await handleSubmit();
                     } else {
                       handleNext();
                     }
@@ -285,10 +336,10 @@ export default function AssistPage() {
               
               {(currentStep === 5 && selectedCategory) && (
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     if (providerType === 'byod') {
                       // Handle BYOD completion
-                      alert('Process completed!');
+                      await handleSubmit();
                     } else {
                       handleNext();
                     }
@@ -309,9 +360,9 @@ export default function AssistPage() {
               
               {(currentStep === 6 && selectedDevice) && (
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     // Handle completion logic for non-BYOD flow
-                    alert('Process completed!');
+                    await handleSubmit();
                   }}
                   className="px-6 py-3 bg-green-600 text-white rounded-lg hover:opacity-90 transition-all font-medium"
                 >
