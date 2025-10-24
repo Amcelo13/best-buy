@@ -221,37 +221,35 @@ export default function AssistPage() {
       <Transition.Root show={isSuccessDialogOpen} as={Fragment}>
         <Dialog
           as="div"
-          className="fixed inset-0 z-10 overflow-y-auto"
+          className="relative z-50"
           initialFocus={cancelButtonRef}
           onClose={() => setIsSuccessDialogOpen(false)}
         >
-          <div className="min-h-screen px-4 text-center">
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <DialogBackdrop className="fixed inset-0 bg-black/30 transition-opacity" />
-            </Transition.Child>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/30 transition-opacity" />
+          </Transition.Child>
 
-            <span className="inline-block h-screen align-middle" aria-hidden="true">
-              &#8203;
-            </span>
+          <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
 
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              enterTo="opacity-100 translate-y-0 sm:scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-              leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            >
-              <div className="inline-block w-full max-w-2xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                enterTo="opacity-100 translate-y-0 sm:scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              >
+                <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-white p-6 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
                 <div className="flex justify-between items-center mb-4">
                   <Dialog.Title as="h3" className="text-2xl font-bold text-gray-900">
                     Plan Details
@@ -267,7 +265,7 @@ export default function AssistPage() {
 
                 {submissionResult?.data && (
                   <div
-                    className={`p-6 rounded-lg mb-6 ${submissionResult.data.provider.toLowerCase() === 'bell'
+                    className={`p-6 rounded-lg mb-6 ${submissionResult?.data?.provider?.toLowerCase() === 'bell'
                         ? 'bg-blue-50'
                         : 'bg-red-50'
                       }`}
@@ -330,7 +328,7 @@ export default function AssistPage() {
                   </button>
                   <button
                     type="button"
-                    className={`px-4 py-2 text-sm font-medium text-white rounded-md ${submissionResult?.data?.provider.toLowerCase() === 'bell'
+                    className={`px-4 py-2 text-sm font-medium text-white rounded-md ${submissionResult?.data?.provider?.toLowerCase() === 'bell'
                         ? 'bg-blue-600 hover:bg-blue-700'
                         : 'bg-red-600 hover:bg-red-700'
                       }`}
@@ -342,8 +340,9 @@ export default function AssistPage() {
                     Proceed to Checkout
                   </button>
                 </div>
-              </div>
-            </Transition.Child>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
           </div>
         </Dialog>
       </Transition.Root>
