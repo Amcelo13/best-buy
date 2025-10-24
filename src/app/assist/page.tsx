@@ -250,11 +250,11 @@ export default function AssistPage() {
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-white p-6 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
+                <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-white p-6 text-left shadow-xl transition-all sm:my-8 sm:w-full lg:max-w-5xl">
                 <div className="flex justify-between items-center mb-4">
-                  <Dialog.Title as="h3" className="text-2xl font-bold text-gray-900">
+                  {/* <Dialog.Title as="h3" className="text-2xl font-bold text-gray-900">
                     Plan Details
-                  </Dialog.Title>
+                  </Dialog.Title> */}
                   <button
                     type="button"
                     className="text-gray-400 hover:text-gray-500"
@@ -276,111 +276,116 @@ export default function AssistPage() {
                       </span>
                     </div>
 
-                    {/* Best Data Plan */}
-                    {submissionResult.data.bestDataPlan && (
-                      <div className="bg-white border rounded-lg overflow-hidden">
-                        <div className="bg-blue-600 text-white px-4 py-3">
-                          <h5 className="font-semibold text-lg">Best Data Option</h5>
-                        </div>
-                        <div className="p-6">
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-blue-600">{submissionResult.data.bestDataPlan.data}</div>
-                              <div className="text-sm text-gray-500">Data</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-blue-600">${submissionResult.data.bestDataPlan.linePrice}</div>
-                              <div className="text-sm text-gray-500">Line 1 Price</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-blue-600">${submissionResult.data.bestDataPlan.totalCost}</div>
-                              <div className="text-sm text-gray-500">Total Cost ({submissionResult.data.bestDataPlan.lines} line{submissionResult.data.bestDataPlan.lines > 1 ? 's' : ''})</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-lg font-semibold text-gray-700">{submissionResult.data.bestDataPlan.tier}</div>
-                              <div className="text-sm text-gray-500">Plan Tier</div>
-                            </div>
+                    {/* Plans side-by-side */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Best Data Plan */}
+                      {submissionResult.data.bestDataPlan && (
+                        <div className="bg-white rounded-2xl overflow-hidden ring-1 ring-gray-200 shadow-lg hover:shadow-xl transition-shadow">
+                          <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-5 py-3 flex items-center justify-between">
+                            <h5 className="font-semibold text-lg">Best Data Option</h5>
+                            <span className="inline-flex items-center rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium">Max Data</span>
                           </div>
-                          
-                          {/* Line-by-line breakdown */}
-                          {submissionResult.data.bestDataPlan.lines > 1 && submissionResult.data.bestDataPlan.linePricing && (
-                            <div className="bg-blue-50 p-4 rounded-lg mb-4">
-                              <h6 className="font-semibold mb-2">Line Breakdown</h6>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                                {submissionResult.data.bestDataPlan.linePricing.map((line: any) => (
-                                  <div key={line.lineNumber} className="text-center p-2 bg-white rounded border">
-                                    <div className="font-medium text-blue-600">Line {line.lineNumber}</div>
-                                    <div className="text-sm">${line.price}</div>
-                                  </div>
-                                ))}
+                          <div className="p-6">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-5">
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-blue-600">{submissionResult.data.bestDataPlan.data}</div>
+                                <div className="text-sm text-gray-500">Data</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-blue-600">${submissionResult.data.bestDataPlan.linePrice}</div>
+                                <div className="text-sm text-gray-500">Per-line Price</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-blue-600">${submissionResult.data.bestDataPlan.totalCost}</div>
+                                <div className="text-sm text-gray-500">Total Cost ({submissionResult.data.bestDataPlan.lines} line{submissionResult.data.bestDataPlan.lines > 1 ? 's' : ''})</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-lg font-semibold text-gray-700">{submissionResult.data.bestDataPlan.tier}</div>
+                                <div className="text-sm text-gray-500">Plan Tier</div>
                               </div>
                             </div>
-                          )}
-                          <div className="bg-blue-50 p-4 rounded-lg">
-                            <h6 className="font-semibold mb-2">Plan Details</h6>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              <div><span className="font-medium">Plan:</span> {submissionResult.data.bestDataPlan.planName}</div>
-                              <div><span className="font-medium">SOC Code:</span> {submissionResult.data.bestDataPlan.socCode}</div>
-                              <div><span className="font-medium">Activity:</span> {submissionResult.data.bestDataPlan.activity}</div>
-                              <div><span className="font-medium">Roaming:</span> {submissionResult.data.bestDataPlan.roaming}</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
 
-                    {/* Best Price Plan */}
-                    {submissionResult.data.bestPricePlan && (
-                      <div className="bg-white border rounded-lg overflow-hidden">
-                        <div className="bg-green-600 text-white px-4 py-3">
-                          <h5 className="font-semibold text-lg">Best Price Option</h5>
-                        </div>
-                        <div className="p-6">
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-green-600">{submissionResult.data.bestPricePlan.data}</div>
-                              <div className="text-sm text-gray-500">Data</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-green-600">${submissionResult.data.bestPricePlan.linePrice}</div>
-                              <div className="text-sm text-gray-500">Line 1 Price</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-green-600">${submissionResult.data.bestPricePlan.totalCost}</div>
-                              <div className="text-sm text-gray-500">Total Cost ({submissionResult.data.bestPricePlan.lines} line{submissionResult.data.bestPricePlan.lines > 1 ? 's' : ''})</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-lg font-semibold text-gray-700">{submissionResult.data.bestPricePlan.tier}</div>
-                              <div className="text-sm text-gray-500">Plan Tier</div>
-                            </div>
-                          </div>
-                          
-                          {/* Line-by-line breakdown */}
-                          {submissionResult.data.bestPricePlan.lines > 1 && submissionResult.data.bestPricePlan.linePricing && (
-                            <div className="bg-green-50 p-4 rounded-lg mb-4">
-                              <h6 className="font-semibold mb-2">Line Breakdown</h6>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                                {submissionResult.data.bestPricePlan.linePricing.map((line: any) => (
-                                  <div key={line.lineNumber} className="text-center p-2 bg-white rounded border">
-                                    <div className="font-medium text-green-600">Line {line.lineNumber}</div>
-                                    <div className="text-sm">${line.price}</div>
-                                  </div>
-                                ))}
+                            {/* Line-by-line breakdown */}
+                            {submissionResult.data.bestDataPlan.lines > 1 && submissionResult.data.bestDataPlan.linePricing && (
+                              <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                                <h6 className="font-semibold mb-2">Line Breakdown</h6>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                                  {submissionResult.data.bestDataPlan.linePricing.map((line: any) => (
+                                    <div key={line.lineNumber} className="text-center p-2 bg-white/80 rounded border border-blue-100 shadow-sm">
+                                      <div className="font-medium text-blue-600">Line {line.lineNumber}</div>
+                                      <div className="text-sm">${line.price}</div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            <div className="bg-blue-50 p-4 rounded-lg">
+                              <h6 className="font-semibold mb-2">Plan Details</h6>
+                              <div className="grid grid-cols-2 gap-2 text-sm">
+                                <div><span className="font-medium">Plan:</span> {submissionResult.data.bestDataPlan.planName}</div>
+                                <div><span className="font-medium">SOC Code:</span> {submissionResult.data.bestDataPlan.socCode}</div>
+                                <div><span className="font-medium">Activity:</span> {submissionResult.data.bestDataPlan.activity}</div>
+                                <div><span className="font-medium">Roaming:</span> {submissionResult.data.bestDataPlan.roaming}</div>
                               </div>
                             </div>
-                          )}
-                          <div className="bg-green-50 p-4 rounded-lg">
-                            <h6 className="font-semibold mb-2">Plan Details</h6>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              <div><span className="font-medium">Plan:</span> {submissionResult.data.bestPricePlan.planName}</div>
-                              <div><span className="font-medium">SOC Code:</span> {submissionResult.data.bestPricePlan.socCode}</div>
-                              <div><span className="font-medium">Activity:</span> {submissionResult.data.bestPricePlan.activity}</div>
-                              <div><span className="font-medium">Roaming:</span> {submissionResult.data.bestPricePlan.roaming}</div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Best Price Plan */}
+                      {submissionResult.data.bestPricePlan && (
+                        <div className="bg-white rounded-2xl overflow-hidden ring-1 ring-gray-200 shadow-lg hover:shadow-xl transition-shadow">
+                          <div className="bg-gradient-to-r from-green-600 to-green-500 text-white px-5 py-3 flex items-center justify-between">
+                            <h5 className="font-semibold text-lg">Best Price Option</h5>
+                            <span className="inline-flex items-center rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-medium">Best Price</span>
+                          </div>
+                          <div className="p-6">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-5">
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-green-600">{submissionResult.data.bestPricePlan.data}</div>
+                                <div className="text-sm text-gray-500">Data</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-green-600">${submissionResult.data.bestPricePlan.linePrice}</div>
+                                <div className="text-sm text-gray-500">Per-line Price</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-2xl font-bold text-green-600">${submissionResult.data.bestPricePlan.totalCost}</div>
+                                <div className="text-sm text-gray-500">Total Cost ({submissionResult.data.bestPricePlan.lines} line{submissionResult.data.bestPricePlan.lines > 1 ? 's' : ''})</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-lg font-semibold text-gray-700">{submissionResult.data.bestPricePlan.tier}</div>
+                                <div className="text-sm text-gray-500">Plan Tier</div>
+                              </div>
+                            </div>
+
+                            {/* Line-by-line breakdown */}
+                            {submissionResult.data.bestPricePlan.lines > 1 && submissionResult.data.bestPricePlan.linePricing && (
+                              <div className="bg-green-50 p-4 rounded-lg mb-4">
+                                <h6 className="font-semibold mb-2">Line Breakdown</h6>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                                  {submissionResult.data.bestPricePlan.linePricing.map((line: any) => (
+                                    <div key={line.lineNumber} className="text-center p-2 bg-white/80 rounded border border-green-100 shadow-sm">
+                                      <div className="font-medium text-green-600">Line {line.lineNumber}</div>
+                                      <div className="text-sm">${line.price}</div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            <div className="bg-green-50 p-4 rounded-lg">
+                              <h6 className="font-semibold mb-2">Plan Details</h6>
+                              <div className="grid grid-cols-2 gap-2 text-sm">
+                                <div><span className="font-medium">Plan:</span> {submissionResult.data.bestPricePlan.planName}</div>
+                                <div><span className="font-medium">SOC Code:</span> {submissionResult.data.bestPricePlan.socCode}</div>
+                                <div><span className="font-medium">Activity:</span> {submissionResult.data.bestPricePlan.activity}</div>
+                                <div><span className="font-medium">Roaming:</span> {submissionResult.data.bestPricePlan.roaming}</div>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
 
                     {/* Submission Details */}
                     <div className="bg-gray-50 p-4 rounded-lg">
@@ -399,29 +404,7 @@ export default function AssistPage() {
                   </div>
                 )}
 
-                <div className="mt-6 flex justify-end space-x-3">
-                  <button
-                    type="button"
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-                    onClick={() => setIsSuccessDialogOpen(false)}
-                    ref={cancelButtonRef}
-                  >
-                    Close
-                  </button>
-                  <button
-                    type="button"
-                    className={`px-4 py-2 text-sm font-medium text-white rounded-md ${submissionResult?.data?.provider?.toLowerCase() === 'bell'
-                        ? 'bg-blue-600 hover:bg-blue-700'
-                        : 'bg-red-600 hover:bg-red-700'
-                      }`}
-                    onClick={() => {
-                      setIsSuccessDialogOpen(false);
-                      // Handle checkout or next steps
-                    }}
-                  >
-                    Proceed to Checkout
-                  </button>
-                </div>
+         
                 </Dialog.Panel>
               </Transition.Child>
             </div>
