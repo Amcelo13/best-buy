@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useId } from 'react';
 import Image from 'next/image';
 import { DndContext, DragEndEvent, DragOverlay, useDraggable, useDroppable, DragStartEvent } from '@dnd-kit/core';
 import { UserIcon, UsersIcon, CheckIcon } from './Icons';
@@ -18,6 +19,7 @@ const providers = [
 ];
 
 function DraggableProvider({ id, name, logo }: { id: string; name: string; logo: string }) {
+    const descriptionId = useId();
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id,
   });
@@ -35,6 +37,7 @@ function DraggableProvider({ id, name, logo }: { id: string; name: string; logo:
       style={style}
       {...listeners}
       {...attributes}
+      aria-describedby={descriptionId}
       className="bg-[var(--card)] rounded-xl shadow-lg p-6 border-2 border-[var(--border)] hover:border-[var(--primary)] transition-all cursor-grab active:cursor-grabbing touch-none"
     >
       <div className="flex justify-center mb-3">
