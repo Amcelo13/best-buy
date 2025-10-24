@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useRef, Fragment } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { Dialog, DialogBackdrop, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
@@ -17,7 +16,6 @@ import { submitAssistForm } from '@/services/assistService';
 import { type AssistFormData, type CustomerType, type ProviderType } from '@/types/assist.types';
 
 export default function AssistPage() {
-  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
@@ -250,7 +248,7 @@ export default function AssistPage() {
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <Dialog.Panel className="relative transform overflow-hidden rounded-2xl bg-white p-6 text-left shadow-xl transition-all sm:my-8 sm:w-full lg:max-w-5xl">
+                <Dialog.Panel className={`relative transform overflow-hidden rounded-2xl p-6 text-left shadow-xl transition-all sm:my-8 sm:w-full lg:max-w-5xl ${submissionResult?.data?.selectedProvider?.toLowerCase() === 'virgin' ? 'bg-red-50' : 'bg-white'}`}>
                 <div className="flex justify-between items-center mb-4">
                   {/* <Dialog.Title as="h3" className="text-2xl font-bold text-gray-900">
                     Plan Details
