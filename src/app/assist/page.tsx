@@ -57,6 +57,10 @@ export default function AssistPage() {
     setSelectedPlan(plan);
     // Auto-advance to step 4 when plan is selected
     if (plan) {
+      // Auto-select consumer category for Virgin
+      if (selectedProvider?.toLowerCase() === 'virgin') {
+        setSelectedCategory('consumer');
+      }
       setTimeout(() => setCurrentStep(4), 500);
     }
   };
@@ -86,6 +90,12 @@ export default function AssistPage() {
       return; // BYOD flow ends at step 5 (category selection)
     }
     
+    // Virgin + BYOD ends at step 4
+    if (selectedProvider?.toLowerCase() === 'virgin' && providerType === 'byod' && currentStep === 4) {
+      console.log('Virgin BYOD flow completed at step 4');
+      return;
+    }
+    
     if (currentStep === 1 && selectedProvider && customerType) {
       setCurrentStep(2);
     } else if (currentStep === 2 && providerType) {
@@ -93,8 +103,13 @@ export default function AssistPage() {
     } else if (currentStep === 3 && selectedPlan) {
       setCurrentStep(4);
     } else if (currentStep === 4) {
-      // Go to category selection for all provider types
-      setCurrentStep(5);
+      // Skip category selection for Virgin (already auto-selected)
+      if (selectedProvider?.toLowerCase() === 'virgin' && providerType !== 'byod') {
+        setCurrentStep(6);
+      } else {
+        // Go to category selection for other providers
+        setCurrentStep(5);
+      }
     } else if (currentStep === 5 && selectedCategory) {
       // Only non-BYOD flows go to step 6
       setCurrentStep(6);
@@ -106,6 +121,11 @@ export default function AssistPage() {
     // Don't allow clicking on future steps
     if (step > currentStep) return;
     
+    // Special handling for Virgin + BYOD flow (ends at step 4)
+    if (selectedProvider?.toLowerCase() === 'virgin' && providerType === 'byod' && step > 4) {
+      return;
+    }
+    
     // Special handling for BYOD flow
     if (providerType === 'byod' && step > 5) {
       return; // Skip device selection for BYOD
@@ -116,8 +136,14 @@ export default function AssistPage() {
 
   const handleBack = () => {
     if (currentStep === 6) {
-      setCurrentStep(5);
-      setSelectedDevice(null); // Reset device selection
+      // For Virgin, go back to step 4 (skip category selection)
+      if (selectedProvider?.toLowerCase() === 'virgin') {
+        setCurrentStep(4);
+        setSelectedDevice(null); // Reset device selection
+      } else {
+        setCurrentStep(5);
+        setSelectedDevice(null); // Reset device selection
+      }
     } else if (currentStep === 5) {
       setCurrentStep(4);
       setSelectedCategory(null); // Reset category selection
@@ -189,13 +215,18 @@ export default function AssistPage() {
             >
               4
             </div>
-            <div className={`w-6 h-1 ${currentStep >= 5 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
-            <div 
-              onClick={() => handleStepClick(5)}
-              className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm cursor-pointer ${currentStep >= 5 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}
-            >
-              5
-            </div>
+            {/* Only show category step for non-Virgin providers */}
+            {selectedProvider?.toLowerCase() !== 'virgin' && (
+              <>
+                <div className={`w-6 h-1 ${currentStep >= 5 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
+                <div 
+                  onClick={() => handleStepClick(5)}
+                  className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm cursor-pointer ${currentStep >= 5 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}
+                >
+                  5
+                </div>
+              </>
+            )}
             {providerType !== 'byod' && (
               <>
                 <div className={`w-6 h-1 ${currentStep >= 6 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'}`}></div>
@@ -203,7 +234,7 @@ export default function AssistPage() {
                   onClick={() => handleStepClick(6)}
                   className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm cursor-pointer ${currentStep >= 6 ? 'bg-[var(--primary)] text-[var(--primary-foreground)]' : 'bg-[var(--muted)] text-[var(--muted-foreground)]'}`}
                 >
-                  6
+                  {selectedProvider?.toLowerCase() === 'virgin' ? '5' : '6'}
                 </div>
               </>
             )}
@@ -216,8 +247,13 @@ export default function AssistPage() {
             <span className="text-xs font-medium text-[var(--foreground)]">Plan</span>
             <span className="w-6"></span>
             <span className="text-xs font-medium text-[var(--foreground)]">Subscribers</span>
-            <span className="w-6"></span>
-            <span className="text-xs font-medium text-[var(--foreground)]">Category</span>
+            {/* Only show Category label for non-Virgin providers */}
+            {selectedProvider?.toLowerCase() !== 'virgin' && (
+              <>
+                <span className="w-6"></span>
+                <span className="text-xs font-medium text-[var(--foreground)]">Category</span>
+              </>
+            )}
             {providerType !== 'byod' && (
               <>
                 <span className="w-6"></span>
@@ -241,10 +277,21 @@ export default function AssistPage() {
               
               {currentStep === 4 && (
                 <button
-                  onClick={handleNext}
-                  className="px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:opacity-90 transition-all font-medium"
+                  onClick={() => {
+                    // Virgin + BYOD ends at step 4
+                    if (selectedProvider?.toLowerCase() === 'virgin' && providerType === 'byod') {
+                      alert('Process completed!');
+                    } else {
+                      handleNext();
+                    }
+                  }}
+                  className={`px-6 py-3 ${
+                    selectedProvider?.toLowerCase() === 'virgin' && providerType === 'byod'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-[var(--primary)] text-[var(--primary-foreground)]'
+                  } rounded-lg hover:opacity-90 transition-all font-medium`}
                 >
-                  Next
+                  {selectedProvider?.toLowerCase() === 'virgin' && providerType === 'byod' ? 'Submit' : 'Next'}
                 </button>
               )}
               
@@ -326,7 +373,8 @@ export default function AssistPage() {
             />
           )}
 
-          {currentStep === 5 && (
+          {/* Only show category selection for non-Virgin providers */}
+          {currentStep === 5 && selectedProvider?.toLowerCase() !== 'virgin' && (
             <CustomerCategory
               selectedCategory={selectedCategory}
               setSelectedCategory={handleCategorySelection}
